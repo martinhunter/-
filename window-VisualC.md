@@ -1,8 +1,8 @@
 markdown_rules: https://markdown.tw/#overview
-## 1 VC++ 6.0
-    win32 API: 提供与windows 系统相关的函数(内核除外）
-### 1.1 API的调用： 
+### 1. API的调用： 
 > #include<windows.h>
+win32 API: 提供与windows 系统相关的函数(内核除外）
+
 ### 2 win32程序运行原理
 #### 2.1 windows的多任务（进程）实现
 * 虚拟内存： 每个进程都有自己的4GB私有空间（32位地址空间），机制依靠cpu帮助操作系统将磁盘空间当做内存空间来使用，在磁盘上应用于这一机制的文件被称为页文件（paging file），页文件属性设置了访问模式标记（用户、内核访问权限）页文件包含了对所有进程都有效的虚拟内存，windows将空间虚拟空间的前一半留给进程，后一半来存储操作系统内部使用的数据，且这一半被保护不能被其他线程访问。用户程序的代码在`用户模式`下运行，系统程序（如系统服务程序和硬件驱动）的代码在`内核模式`下运行。
@@ -51,3 +51,15 @@ CreateProcess函数搜索可执行文件的路径：
     PROCESS_INFORMATION pi； // 创建进程后返回新建进程的标志信息，如ID号，句柄等。
     char* szCommandLine = "notepad"; // 要传递给执行模块的参数。
     ::CreateProcess(NULL, szCommandLine, NULL, NULL, FALSE, NULL, NULL, NULL, &si, &pi);
+#### 2.4 中止进程
+* 主线程的入口函数返回。例： 程序入口main函数return时，启动函数会调用C/C++运行期退出函数exit，并将用户返回值传给它
+* 进程中的一个线程调用了ExitProcess（一个API函数）。
+* 此进程中所有线程都结束了。
+* 其他进程中的一个线程调用了`TerminateProcess（HANDLE hProcess// 要结束的进程的句柄， UNIT uExitcode // 指定目标进程的退出代码）函数`
+
+#### 2.5 保护进程
+1. 防止此进程被其他进程检测到。
+2. 防止此进程被其他进程中止。
+
+对方法1： 检测系统进程时通常用ToolHelp或Process Status函数，hook掉系统对这些函数的调用，使这两个函数返回值不包含此进程。
+对方法2： hook掉其他进程对TerminateProcess函数的调用
