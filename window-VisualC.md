@@ -62,4 +62,15 @@ CreateProcess函数搜索可执行文件的路径：
 2. 防止此进程被其他进程中止。
 
 对方法1： 检测系统进程时通常用ToolHelp或Process Status函数，hook掉系统对这些函数的调用，使这两个函数返回值不包含此进程。
-对方法2： hook掉其他进程对TerminateProcess函数的调用
+对方法2： hook掉其他进程对TerminateProcess函数的调用(包括任务管理器也使用TerminateProcess函数）
+
+### 游戏内存修改器
+1. 原理：修改游戏所在进程的内存。进程的地址空间相互隔离，利用API函数访问其他函数的内存。
+    BOOL ReadProcessMemery(
+        HANDLE hProcess, // 待读进程的句柄
+        LPCVOID lpBaseAddress, // 目标进程中待读内存的起始地址(游戏进程中搜索所需数据的内存地址）
+        LPVOID lpBuffer, // 接受读取数据的缓冲区
+        DWORD nSize, // 要读取的字节数
+        LPDWORD lpNumberOfBytesRead // 供函数返回实际读取的字节数
+        );
+    WriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
