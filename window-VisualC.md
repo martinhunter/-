@@ -1,6 +1,8 @@
+
 markdown_rules: https://markdown.tw/#overview
 ### 1. API的调用： 
-> #include<windows.h>
+> \#include<windows.h>
+
 win32 API: 提供与windows 系统相关的函数(内核除外）
 
 ### 2 win32程序运行原理
@@ -65,7 +67,11 @@ CreateProcess函数搜索可执行文件的路径：
 对方法2： hook掉其他进程对TerminateProcess函数的调用(包括任务管理器也使用TerminateProcess函数）
 
 ### 游戏内存修改器
-1. 原理：修改游戏所在进程的内存。进程的地址空间相互隔离，利用API函数访问其他函数的内存。
+原理：修改游戏所在进程的内存。进程的地址空间相互隔离，利用API函数访问其他函数的内存。
+
+条件是**目标值（例如游戏内金钱数）的内存地址值不会变**
+> 读写参数,对每个找到的值进行测试以确定要改变的目标。
+
     BOOL ReadProcessMemery(
         HANDLE hProcess, // 待读进程的句柄
         LPCVOID lpBaseAddress, // 目标进程中待读内存的起始地址(游戏进程中搜索所需数据的内存地址）
@@ -74,3 +80,26 @@ CreateProcess函数搜索可执行文件的路径：
         LPDWORD lpNumberOfBytesRead // 供函数返回实际读取的字节数
         );
     WriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
+> 搜索目标地址
+
+    BOOL FindFirst(DWORD dwValue); // 在目标空间中第一次查找
+    BOOL FindNext(DWORD dwValue); // 后续查找
+    DWORD g_arList[1024]; // 地址列表
+    int g_nListCnt; // 有效地址的个数
+    HANDLE g_hProcess; // 目标进程句柄
+> 测试修改程序
+例：游戏现在显示的金钱数现为12325，搜索到多个地址值，在游戏中改变金钱数量为比如12426，再从这些地址值中再次搜索，递归直到找到唯一地址值。
+    
+    #include<stdio.h>
+    int g_nNum;
+    int main(int argc, char*argv[]){
+        int i = 198;
+        g_nNum = 1003;
+        while(1){
+            pringf("i=%d, addr=%081X; g_nNum=%d, addr=%081X\n",++i,&i,--g_nNum,&g_nNum);
+            getchar();
+        }
+        return 0;
+    }
+        
+
