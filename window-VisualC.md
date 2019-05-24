@@ -66,7 +66,7 @@ CreateProcess函数搜索可执行文件的路径：
 对方法1： 检测系统进程时通常用ToolHelp或Process Status函数，hook掉系统对这些函数的调用，使这两个函数返回值不包含此进程。
 对方法2： hook掉其他进程对TerminateProcess函数的调用(包括任务管理器也使用TerminateProcess函数）
 
-### 游戏内存修改器
+### 建立游戏内存修改器
 原理：修改游戏所在进程的内存。进程的地址空间相互隔离，利用API函数访问其他函数的内存。
 
 条件是**目标值（例如游戏内金钱数）的内存地址值不会变**
@@ -102,4 +102,32 @@ CreateProcess函数搜索可执行文件的路径：
         return 0;
     }
         
+游戏内存修改器封装在一个类中
 
+    class GameMemoFinder{
+        public:
+            GameMemoFinder(DWORD dwProcessId);
+            virtual ~GameMemoFinder();
+        // 属性
+        publlic:
+            Bool IsFirst() const{
+                return m_bFirst;}
+            Bool IsValid() const{
+                return m_hProcess != NULL;}
+            int GetListCount() const{
+                return m_nListCnt;}
+            DWORD operator[](int nIndex){
+                return m_arList[nIndex];}
+        // 操作        
+            virtual BOOL FindFirst(DWORD dwValue);
+            virtual BOOL FindNext(DWORD dwValue);
+            virtual BOOL WriteMemory(DWORD dwAddr, DWORD dwValue);
+        // 实现    
+        protected:
+            virtual BOOL ComparAPage(DWORD dwBaaseAddr. DWORD dwValue);
+            DWORD m_arList[1024];
+            int m_nListCnt;
+            HANDLE m_hProcess;
+            BOOL m_bFirst;
+    };
+***
