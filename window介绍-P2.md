@@ -3,7 +3,8 @@
 显示图形界面的入口函数不是`int main(int argc, char* argv[]){code block};`而是
 
 ```C++
-hInstance = (HINSTANCE) GetModuleHandle(NULL);  // 应用程序的实例句柄（即模块句柄）,模块句柄的值就是模块在内存中的首地址
+// 应用程序的实例句柄（即模块句柄）,模块句柄的值就是模块在内存中的首地址
+hInstance = (HINSTANCE) GetModuleHandle(NULL);  
 // *入口函数中的参数（跟main中的参数一样）是系统自动创建（初始化），而不是手动外界传递。
 int APIENTRY WinMain(HINSTANCE hInstance,  // 本模块的实例句柄
                       HINSTANCE hPrevInstance,  // 2006年后已不再用
@@ -63,7 +64,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,  HINSTANCE hPrevInstance, LPSTR lpCmdL
 	::UpdateWindow(hwnd);
 	// 从消息队列中取出消息，交给窗口函数处理，知道GetMessage返回FALSE, 结束消息循环
 	MSG msg;
-	while(::GetMessage(&msg, NULL, 0, 0))  // GetMessage平时保持阻塞，其初始返回值不为0，只要不传入QUIT, 这返回值就不会变化，不会退出循环，消息到达时会先分派到*回调函数*（DispatchMessage）处理后，再传给GetMessage）
+	/* GetMessage平时保持阻塞，其初始返回值不为0，只要不传入QUIT, 这返回值就不会变化，不会退出循环，
+	消息到达时会先分派到*回调函数*（DispatchMessage）处理后，再传给GetMessage）*/
+	while(::GetMessage(&msg, NULL, 0, 0))  
 	{
 		::TranslateMessage(&msg);  // 转化键盘消息
 		::DispatchMessage(&msg);}  // 将消息发送到相应的窗口函数
