@@ -25,11 +25,11 @@ LRESULT CALLBACK MainWndProc(HWND, UNIT, WPARAM, LPARAM);
 int APIENTRY WinMain(HINSTANCE hInstance,  HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 	char szClassName[] = "MainWClass";
 	
-	// 设定窗口类，用描述主窗口的参数填充WNDCLASSEX结构，后边创建的新窗口继承这个类的属性
+	// 设定窗口类，用描述主窗口的参数填充WNDCLASSEX结构，定义窗口的一些主要属性，后边创建的新窗口继承这个类的属性。
 	WNDCLASSEX wndclass;  
 	wndclass.cbSize = sizeof(wndclass);  // 结构大小
 	wndclass.stle = CS_HREDRAW|CS_VREDRAW;  // 如果大小改变就重画
-	wndclass.lpfnWndProc = MainWndProc;  // 窗口函数指针
+	wndclass.lpfnWndProc = MainWndProc;  // 窗口函数指针，指定窗口消息处理函数的地址
 	wndclass.cbClsExrtra = 0;  // 没有额外的类内存
 	wmdclass.cnWmdExtra = 0;  // 没有额外的窗口内存
 	wndclass.hInstance = hInstance;  // 实例句柄
@@ -37,7 +37,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,  HINSTANCE hPrevInstance, LPSTR lpCmdL
 	wndclass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
 	wndclass.hbrBackground = (HBRUSH)::GetStockObject(WHITE_BRUSH);
 	wndclass.lpszMenuName = NULL;
-	wndclass.lpszClassName = szClasssName;
+	wndclass.lpszClassName = szClasssName;  // 指定窗口类名称，基于此类wndclass创建的窗口都要引用这个类名szClassName
 	wndclass.hIconSm = NULL;
 	::RegisterClassEx(&wndclass);  // 注册窗口类
 	
@@ -63,7 +63,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,  HINSTANCE hPrevInstance, LPSTR lpCmdL
 	::UpdateWindow(hwnd);
 	// 从消息队列中取出消息，交给窗口函数处理，知道GetMessage返回FALSE, 结束消息循环
 	MSG msg;
-	while(::GetMessage(&msg, NULL, 0, 0))  // GetMessage平时保持阻塞，其初始返回值不为0，只要不传入QUIT, 这返回值就不会变化，不会退出循环）
+	while(::GetMessage(&msg, NULL, 0, 0))  // GetMessage平时保持阻塞，其初始返回值不为0，只要不传入QUIT, 这返回值就不会变化，不会退出循环，消息到达时会先分派到*回调函数*（DispatchMessage）处理后，再传给GetMessage）
 	{
 		::TranslateMessage(&msg);  // 转化键盘消息
 		::DispatchMessage(&msg);}  // 将消息发送到相应的窗口函数
