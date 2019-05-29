@@ -62,11 +62,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,  HINSTANCE hPrevInstance, LPSTR lpCmdL
 	// 显示窗口，刷新窗口客户区
 	::ShowWindow(hwnd, nCmdShow);
 	::UpdateWindow(hwnd);
+	
+	//window为每个线程维护一个消息队列
 	// 从消息队列中取出消息，交给窗口函数处理，知道GetMessage返回FALSE, 结束消息循环
 	MSG msg;
 	/* GetMessage平时保持阻塞，其初始返回值不为0，只要不传入QUIT, 这返回值就不会变化，不会退出循环，
 	消息到达时会先分派到*回调函数*（DispatchMessage）处理后，再传给GetMessage）*/
-	while(::GetMessage(&msg, NULL, 0, 0))  
+	while(::GetMessage(&msg, NULL, 0, 0))  // 从消息队列中取出一个消息填充MSG结构
 	{
 		::TranslateMessage(&msg);  // 转化键盘消息
 		::DispatchMessage(&msg);}  // 将消息发送到相应的窗口函数
@@ -76,7 +78,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,  HINSTANCE hPrevInstance, LPSTR lpCmdL
 LRESULT CALLBACK MainWndProc(HWND hwnd, UNIT message, WPARAM wParam, LPARAM lParam){
 	char szText[] = "a simple window program"
 	switch(message){
-		case WM_PAINT:  // 窗口客户区需要重画
+		case WM_PAINT:  // 窗口客户区需要重画,有修改如最小化时窗口客户区就会先变为无效
 		{
 			HDC hdc;
 			PAINTSTRUCT ps;
