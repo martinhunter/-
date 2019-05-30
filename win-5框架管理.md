@@ -2,7 +2,7 @@
 MFC(Microsoft Fundation Classes,Microsoft基础类库）是对API函数的简单封装，简化开发过程
 开发者的MFC类库设计过程
 
-### 运行时类信息（CRuntimeClass类）
+### 5.1运行时类信息（CRuntimeClass类）
 > 在程序运行过程中辨别对象是否属于特定类的技术叫动态类型识别（Runtime Type Information，RTTI）
 1.用于函数识别其参数类型。2.用于针对对象所属类编写特定目的的代码。
 
@@ -33,11 +33,11 @@ const int RecoClass::classAddress = 1;
 class CObject;
 struct CRuntimeClassStaticMember{
 	// 属性
-	LPCSTR m_lpszClassName;  // 类名
-	int m_nObjectSize;  // 类大小
-	UINT m_wSchema;  // 类的版本号
-	CObject* (__stdcall* m_pfnCreateObject)();  // (创建类的函数)的指针
-	// 其基类中CRuntimeClassStaticMember结构的地址，即判断当前类是否是继承自含CRuntimeClassStaticMember的基类
+	LPCSTR m_lpszClassName;  //1. 类名
+	int m_nObjectSize;  // 2.类大小
+	UINT m_wSchema;  // 3.类的版本号
+	CObject* (__stdcall* m_pfnCreateObject)();  // 4.(创建类的函数)的指针，以支持动态创建
+	// 5.其基类中CRuntimeClassStaticMember结构的地址，即判断当前类是否是继承自含CRuntimeClassStaticMember的基类
 	CRuntimeClassStaticMember* m_pBaseClass;  
 	
 	// 操作
@@ -90,7 +90,7 @@ const struct CRuntimeClassStaticMember CObject::cObjectAddress = {
 CRuntimeClassStaticMember* CObject::GetRuntimeClass() const{
 	return RUNTIME_CLASS(CObject);
 	// 等同 return ((CRuntimeClassStaticMember*）&(CObject::cObjectAddress));
-	// 返回地址值，地址值的数据类型是CRuntimeClassStaticMember类型
+	// 返回地址值,即类的唯一标识，地址值的数据类型是CRuntimeClassStaticMember类型
 }
 BOOL CObject::IsKindOf(const CRuntimeClassStaticMember* pClass) const{
 	const CRuntimeClassStaticMember* pClassThis = GetRuntimeClass();
@@ -106,9 +106,13 @@ public:
 	virtual CRuntimeClassStaticMember* GetRuntimeClass() const{
 		return ((CRuntimeClassStaticMember*）&cNewCAddress);}
 	static const CRuntimeClassStaticMember cNewCAddress;
+	//为使CNewC类支持动态创建，在初始化类中传递1个创建CNewC对象的函数的地址的静态成员函数。
+	static CObject* __stdcall createObject(){
+		return new CNewC;}  // 由系统来控制创建。
 }；
 const CRuntimeClassStaticMember CNEWC::cNewCAddress = {
-	"CNewC", sizeof(CNewC),0xffff,NULL,
+	"CNewC", sizeof(CNewC),0xffff,
+	&CNewC::CreateObject,  // 现在就能支持动态创建
 	(CRuntimeClassStaticMember*)&(CObject::cObjectAddress),  // 父类的标识地址
 	Null};
 void main(){
@@ -117,9 +121,20 @@ void main(){
 	{
 		CNewC* pNewInstance = (CNewC*)pMyObject;
 		cout<<" 创建了CNweC类对象的实例\n";
-		delete pNewInstance;}
+		delete pNewInstance;}  // 使用完成后删除对象以释放空间
 	else{
 		delete pMyObject;}
-		
-	
 }
+```
+
+>此时只要得到CNewC类中CRuntimeClassStaticMember结构记录的类的信息，就可以动态创建CNewC类，而不用给出类名。可以是用户输入的，也可是磁盘上取得的。
+
+```C++
+void main(){
+	CRuntimeClassStaticMember* pNoNameClass = RUNTIME_CLASS(CNewC);
+	CObject* pNewObject = pNoNameClass->CreateObject();
+	}
+```
+
+### 5.2 调试支持
+
