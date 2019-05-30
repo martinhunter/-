@@ -138,3 +138,32 @@ void main(){
 
 ### 5.2 调试支持
 
+### 5.3 框架程序的映射
+例如窗口类CWnd控制线程中所有窗口，线程中的每个窗口的窗口句柄都应该对应唯一的CWnd指针。
+这要求封装1个类来保存有映射关系的数据。如果是指针映射到指针，将类命名为CMapPtrToPtr,如果是指针到双字的映射，就命名为CMapPtrToWord。
+
+```C++
+// 这个结构表示给定1个key，仅有1个value与其对应，并链接到下一个CAssoc结构
+struct CAssoc{
+	CAssoc* pNext;
+	void* key;
+	void* value;
+	};
+```
+但如果2个CAssoc结构占用不连续的内存空间，这空间又不足容纳1个CAssoc结构，就会产生**内存碎片**。需要先1次性申请较大的空间。
+
+```C++
+// 创建1个链表结构，头部有pHead指针来释放所有空间。
+struct CHead{
+	CHead* pNext;
+	void* data(){
+		return this + 1;
+	}  // 记录链表的数据量
+	// 申请内存的全局函数,申请cbElement大小的空间nMax个
+	 static CHead* Create(CHead* &pHead, UINT nMax, UINT cbElement);
+	 // 释放当前对象为首地址（this指针）的内存链中的所有内存
+	 void FreeeDataChain;
+	 };
+	
+	};
+```
