@@ -11,6 +11,8 @@ win32 API: 提供与windows 系统相关的函数(内核除外）
 * 模式切换： 当应用程序调用一个系统函数的时候，会从用户模式切换到内核模式去执行，`例: win32函数ReadFile最终会调用windows内部的从文件中读取数据的程序代码，因为这代码访问了系统内部的数据，所以必须在内核模式下运行。`
 * 私有的虚拟空间地址： 包含了所有可执行的或是DLL模块的代码和数据，也是程序动态申请内存的地方，比如线程堆栈和进程堆。
 
+> how virtual-memory works.It's been found by experience that the most effective method for a broad class of memory-usage patterns is very simple; it's called LRU or the "least recently used" algorithm. The virtual-memory system grabs disk blocks into its working set as it needs them. When it runs out of physical memory for the working set, it dumps the least-recently-used block. All Unixes, and most other virtual-memory operating systems, use minor variations on LRU.[The Unix and Internet Fundamentals HOWTO](http://en.tldp.org/HOWTO/Unix-and-Internet-Fundamentals-HOWTO/memory-management.html).
+
 #### 2.2 内核对象
     是系统提供的用户模式代码与内核模式下代码进行交互的基本接口，
     程序读写系统数据在系统的监视下进行，仅仅能被内核模式下的代码访问，
