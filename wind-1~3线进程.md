@@ -12,9 +12,9 @@ win32 API: 提供与windows 系统相关的函数(内核除外）
 * 私有的虚拟空间地址： 包含了所有可执行的或是DLL模块的代码和数据，也是程序动态申请内存的地方，比如线程堆栈和进程堆。
 
 > 1. **how virtual-memory works**.It's been found by experience that the most effective method for a broad class of memory-usage patterns is very simple; it's called LRU or the "least recently used" algorithm. The virtual-memory system grabs disk blocks into its working set as it needs them. When it runs out of physical memory for the working set, it dumps the least-recently-used block. All Unixes, and most other virtual-memory operating systems, use minor variations on LRU.
-2. **how to make your programs really fast**.Your programs get faster when they have stronger `locality`, because that makes the caching work better. If a program isn't slowed down by lots of disk I/O or waits on network events, it will usually run at the speed of the smallest cache that it will fit inside.
-3. **If you can't make your whole program small**, some effort to tune the speed-critical portions so they have stronger locality can pay off. Details on techniques for doing such tuning are beyond the scope of this tutorial; by the time you need them, you'll be intimate enough with some compiler to figure out many of them yourself.
-> quoted from [The Unix and Internet Fundamentals HOWTO](http://en.tldp.org/HOWTO/Unix-and-Internet-Fundamentals-HOWTO/memory-management.html).
+> 2. **how to make your programs really fast**.Your programs get faster when they have stronger `locality`, because that makes the caching work better. If a program isn't slowed down by lots of disk I/O or waits on network events, it will usually run at the speed of the smallest cache that it will fit inside.
+> 3. **If you can't make your whole program small**, some effort to tune the speed-critical portions so they have stronger locality can pay off. Details on techniques for doing such tuning are beyond the scope of this tutorial; by the time you need them, you'll be intimate enough with some compiler to figure out many of them yourself.
+> * quoted from [The Unix and Internet Fundamentals HOWTO](http://en.tldp.org/HOWTO/Unix-and-Internet-Fundamentals-HOWTO/memory-management.html).
 
 #### 2.2 内核对象
     是系统提供的用户模式代码与内核模式下代码进行交互的基本接口，
